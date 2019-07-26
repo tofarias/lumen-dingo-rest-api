@@ -1,3 +1,3 @@
 <?php
 
-$api->get('/', 'App\Http\Controllers\UsuarioController@show');
+$api->get('/me', 'A]pp\Http\Controllers\UsuarioController@show');

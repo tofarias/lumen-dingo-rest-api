@@ -25,6 +25,10 @@ $app->withFacades();
 
 $app->withEloquent();
 
+// Register config files
+$app->configure('auth');
+$app->configure('jwt');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -79,7 +83,7 @@ $app->singleton(
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
-$app->register(Dingo\Api\Provider\LumenServiceProvider::class);
+$app->register(\Dingo\Api\Provider\LumenServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
