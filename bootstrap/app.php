@@ -23,11 +23,15 @@ $app = new Laravel\Lumen\Application(
 
 $app->withFacades();
 
-$app->withEloquent();
-
-// Register config files
-$app->configure('auth');
+$app->configure('app');
+$app->configure('api');
 $app->configure('jwt');
+$app->configure('auth');
+
+class_alias(Tymon\JWTAuth\Facades\JWTAuth::class, 'JWTAuth');
+class_alias(Tymon\JWTAuth\Facades\JWTFactory::class, 'JWTFactory');
+
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +52,19 @@ $app->singleton(
 $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
+);
+
+$app->singleton(
+    Illuminate\Auth\AuthManager::class,
+    function ($app) {
+        return $app->make('auth');
+    }
+);
+$app->singleton(
+    Illuminate\Cache\CacheManager::class,
+    function ($app) {
+        return $app->make('cache');
+    }
 );
 
 /*
@@ -81,9 +98,16 @@ $app->singleton(
 */
 
 // $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
+//$app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+//$app->register(\Dingo\Api\Provider\LumenServiceProvider::class);
+
+// JWTAuth Dependencies
+
 $app->register(\Dingo\Api\Provider\LumenServiceProvider::class);
+$app->make(\Dingo\Api\Auth\Auth::class)->extend('jwt', function ($app) {
+    return new \Dingo\Api\Auth\Provider\JWT($app->make(Tymon\JWTAuth\JWTAuth::class));
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -104,9 +128,9 @@ $app->router->group([
 });
 */
 
-$api = app( \Dingo\Api\Routing\Router::class );
+$router = app( \Dingo\Api\Routing\Router::class );
 
-$api->version('v1', function ($api) {
+$router->version('v1', function ($router) {
     require_once __DIR__.'/../routes/api.php';
 });
 
